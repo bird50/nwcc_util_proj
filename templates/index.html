@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}location service by NWCC{% endblock %}
+{%block head%}
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
+<link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
+<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+{%endblock%}
+
+
+{% block header %}
+<h1>บริการแปลง ข้อมูล พิกัด</h1>
+<h3>แปลงข้อมูลพิกัด Lat,Lng เป็น ที่อยู่ ระดับตำบล และลุ่มน้ำ</h3>
+{% endblock %}
+
+{%block body%}
+<div id="hot"></div>
+<div class="btn btn-xs" id='the_btn_go'>go</div>
+<div>
+	<pre id="debug_console">
+	</pre>
+</div>
+{%endblock%}
+
+{%block footer%}
+{{ super() }}
+<script>
+var dataObject = [
+  {
+
+    lat: 0.1,
+    lng: 0.1,
+  },
+  {
+    lat: 0.1,
+    lng: 0.1,
+  },
+  {
+
+    lat: 0.1,
+    lng: 0.1,
+  },
+  {
+    lat: 0.1,
+    lng: 0.1,
+  },
+  {
+
+    lat: 0.1,
+    lng: 0.1,
+  }
+];
+
+
+var hotElement = document.querySelector('#hot');
+var hotElementContainer = hotElement.parentNode;
+var hotSettings = {
+  data: dataObject,
+  columns: [
+    {
+      data: 'lat',
+	  type: 'numeric',
+    },
+    {
+      data: 'lng',
+      type: 'numeric'
+    }
+  ],
+  stretchH: 'all',
+  width: 400,
+  autoWrapRow: true,
+  height: 487,
+  //maxRows: 22,
+  rowHeaders: true,
+  colHeaders: [
+    'Lat',
+    'Lng'
+  ],
+  language: 'en-US',
+  copyPaste: true,
+  licenseKey: 'non-commercial-and-evaluation',
+};  //hotSettings
+var hot = new Handsontable(hotElement, hotSettings);
+var btn_go=document.getElementById("the_btn_go");
+var debug_console=document.getElementById("debug_console");
+
+
+//btn_go.onclick = function(){
+getdat = function(){
+	var json = hot.getData();
+	debug_console.innerText=JSON.stringify(json)
+	
+	fetch('/findaddress',{
+		method: 'POST',
+		headers: {
+	    	'Content-Type': 'application/json',
+	  	},
+	  	body: JSON.stringify(json)
+	}).then(response=> response.json())
+	.then(data=> debug_console.innerText=JSON.stringify(data))
+} 
+
+Handsontable.dom.addEvent(btn_go, 'click', function() {
+	getdat()
+});  // btn_go onclick
+</script>
+{%endblock%}
