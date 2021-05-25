@@ -8,17 +8,29 @@
 
 
 {% block header %}
+<div class="container">
 <h1>บริการแปลง ข้อมูล พิกัด</h1>
 <h3>แปลงข้อมูลพิกัด Lat,Lng เป็น ที่อยู่ ระดับตำบล และลุ่มน้ำ</h3>
+</div>
 {% endblock %}
 
 {%block body%}
-<div id="hot"></div>
-<div class="btn btn-xs" id='the_btn_go'>go</div>
-<div>
-	<pre id="debug_console">
-	</pre>
+<div class="container">
+<div class="row">
+	<div class="col-sm-3 col-md-3">
+		<div id="hot"></div>
+	</div>
+	<div class="col-sm-9 col-md-9">
+		<div id="hot2"></div>
+	</div>
+</div> <!--row-->
+<div class="row">
+	<div class="btn btn-xs" id='the_btn_go'>go</div>
+	<div>
+		<pre id="debug_console"></pre>
+	</div>
 </div>
+</div><!--container--->
 {%endblock%}
 
 {%block footer%}
@@ -52,6 +64,7 @@ var dataObject = [
 
 
 var hotElement = document.querySelector('#hot');
+var hotElement2 = document.querySelector('#hot2');
 var hotElementContainer = hotElement.parentNode;
 var hotSettings = {
   data: dataObject,
@@ -66,7 +79,7 @@ var hotSettings = {
     }
   ],
   stretchH: 'all',
-  width: 400,
+  width: 200,
   autoWrapRow: true,
   height: 487,
   //maxRows: 22,
@@ -79,6 +92,64 @@ var hotSettings = {
   copyPaste: true,
   licenseKey: 'non-commercial-and-evaluation',
 };  //hotSettings
+
+var res_hotSettings = {
+	data: [],
+  columns: [
+    {
+      data: 'lat',
+	  type: 'numeric',
+    },
+    {
+      data: 'lng',
+      type: 'numeric'
+    },
+	{
+	  data: 'region',
+	  type: 'text'
+	},
+	{
+	  data: 'NBASIN_T',
+	  type: 'text'
+	},
+	{
+	  data: 'Sub_BASIN_T',
+	  type: 'text'
+	},
+	{
+	  data: 'PROV_NAMT',
+	  type: 'text'
+	},
+	{
+	  data: 'AMP_NAMT',
+	  type: 'text'
+	},
+	{
+	  data: 'TAM_NAMT',
+	  type: 'text'
+	}
+  ],
+  stretchH: 'all',
+  width: 400,
+  autoWrapRow: true,
+  height: 487,
+  //maxRows: 22,
+  rowHeaders: true,
+  colHeaders: [
+    'Lat',
+    'Lng',
+	'ภาค',
+	'ลุ่มน้ำหลัก',
+	'ลุ่มน้ำสาขา',
+	'จังหวัด',
+	'อำเภอ',
+	 'ตำบล'
+  ],
+  language: 'en-US',
+  copyPaste: true,
+  licenseKey: 'non-commercial-and-evaluation',
+};  //res_hotSettings
+
 var hot = new Handsontable(hotElement, hotSettings);
 var btn_go=document.getElementById("the_btn_go");
 var debug_console=document.getElementById("debug_console");
@@ -96,8 +167,39 @@ getdat = function(){
 	  	},
 	  	body: JSON.stringify(json)
 	}).then(response=> response.json())
-	.then(data=> debug_console.innerText=JSON.stringify(data))
-} 
+	.then( function(data){
+		//debug_console.innerText=JSON.stringify(data)
+		//var geoObject = JSON.parse(data);
+		var features = [];
+		features = data.features;
+		tbl=geo2ar(features);
+		debug_console.innerText=JSON.stringify(features);
+		res_hotSettings.data = tbl
+		var hot2 = new Handsontable(hotElement2, res_hotSettings);
+	}
+		
+	)
+}
+
+var geo2ar = function(features){
+	var tbl_obj = [];
+	features.forEach(function(feature){
+		item= {
+			"lat":feature.properties.lat,
+			"lng":feature.properties.lng,
+			"region":feature.properties.region,
+			"NBASIN_T":feature.properties.NBASIN_T,
+			"Sub_BASIN_T": "",
+			"PROV_NAMT":feature.properties.PROV_NAMT,
+			"AMP_NAMT":feature.properties.AMP_NAMT,
+			"TAM_NAMT":feature.properties.TAM_NAMT,
+		};
+		tbl_obj.push(item);
+	}// function
+	); // forEach
+	return tbl_obj;
+}
+
 
 Handsontable.dom.addEvent(btn_go, 'click', function() {
 	getdat()
