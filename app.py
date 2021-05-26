@@ -13,6 +13,7 @@ def home():
 def findaddress():
     
     req = request.get_json()
+    # test
     #ar= [[6.98899,100.20831],[7.10658,100.05704],[7.23755,100.59734],[8.50352,98.58305]]
     ar=req
     df = DataFrame(ar,columns=['lat','lng'])

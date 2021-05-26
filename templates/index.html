@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}location service by NWCC{% endblock %}
+{% block title %}Location Service by NWCC{% endblock %}
 {%block head%}
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
 <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
@@ -10,26 +10,36 @@
 {% block header %}
 <div class="container">
 <h1>บริการแปลง ข้อมูล พิกัด</h1>
-<h3>แปลงข้อมูลพิกัด Lat,Lng เป็น ที่อยู่ ระดับตำบล และลุ่มน้ำ</h3>
+<p>แปลงข้อมูลพิกัด latitude,longitude เป็น ที่อยู่ ระดับตำบล และลุ่มน้ำ</p>
 </div>
 {% endblock %}
 
 {%block body%}
 <div class="container">
 <div class="row">
-	<div class="col-sm-3 col-md-3">
-		<div id="hot"></div>
-	</div>
-	<div class="col-sm-9 col-md-9">
-		<div id="hot2"></div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">Input</div>
+		<div class="panel-body">
+			<div id="hot"></div>
+		</div>
 	</div>
 </div> <!--row-->
 <div class="row">
-	<div class="btn btn-xs" id='the_btn_go'>go</div>
+	<button class="btn btn-primary btn-lg active" id='the_btn_go'>go</button>
+	&nbsp;&nbsp;&nbsp;
 	<div>
 		<pre id="debug_console"></pre>
 	</div>
-</div>
+</div> <!--row-->
+<div class="row">
+	<div class="panel panel-default">
+		<div class="panel-heading">Output</div>
+		<div class="panel-body">
+			<div id="hot2"></div>
+		</div>
+	</div>
+</div> <!--row-->
 </div><!--container--->
 {%endblock%}
 
@@ -79,14 +89,14 @@ var hotSettings = {
     }
   ],
   stretchH: 'all',
-  width: 200,
+  width: 300,
   autoWrapRow: true,
   height: 487,
   //maxRows: 22,
   rowHeaders: true,
   colHeaders: [
-    'Lat',
-    'Lng'
+    'Latitude',
+    'Longitude'
   ],
   language: 'en-US',
   copyPaste: true,
@@ -130,14 +140,14 @@ var res_hotSettings = {
 	}
   ],
   stretchH: 'all',
-  width: 400,
+  width: 900,
   autoWrapRow: true,
   height: 487,
   //maxRows: 22,
   rowHeaders: true,
   colHeaders: [
-    'Lat',
-    'Lng',
+    'Latitude',
+    'Longitude',
 	'ภาค',
 	'ลุ่มน้ำหลัก',
 	'ลุ่มน้ำสาขา',
@@ -158,7 +168,9 @@ var debug_console=document.getElementById("debug_console");
 //btn_go.onclick = function(){
 getdat = function(){
 	var json = hot.getData();
-	debug_console.innerText=JSON.stringify(json)
+	//debug_console.innerText=JSON.stringify(json)
+	debug_console.innerText= 'Waiting...'
+	btn_go.disabled = true;
 	
 	fetch('/findaddress',{
 		method: 'POST',
@@ -172,17 +184,19 @@ getdat = function(){
 		//var geoObject = JSON.parse(data);
 		var features = [];
 		features = data.features;
-		tbl=geo2ar(features);
-		debug_console.innerText=JSON.stringify(features);
-		res_hotSettings.data = tbl
+		tbl=geo2array(features);
+		//debug_console.innerText=JSON.stringify(features);
+		debug_console.innerText= 'Finish';
+		res_hotSettings.data = tbl;
 		var hot2 = new Handsontable(hotElement2, res_hotSettings);
+		btn_go.disabled = false;
 	}
 		
 	)
 }
 
-var geo2ar = function(features){
-	var tbl_obj = [];
+var geo2array = function(features){
+	var items = [];
 	features.forEach(function(feature){
 		item= {
 			"lat":feature.properties.lat,
@@ -194,10 +208,10 @@ var geo2ar = function(features){
 			"AMP_NAMT":feature.properties.AMP_NAMT,
 			"TAM_NAMT":feature.properties.TAM_NAMT,
 		};
-		tbl_obj.push(item);
+		items.push(item);
 	}// function
 	); // forEach
-	return tbl_obj;
+	return items;
 }
 
 
