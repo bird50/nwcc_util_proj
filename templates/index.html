@@ -48,27 +48,26 @@
 <script>
 var dataObject = [
   {
-
-    lat: 0.1,
-    lng: 0.1,
+    lat: 13.21514653,
+    lng: 100.9627159,
   },
   {
-    lat: 0.1,
-    lng: 0.1,
-  },
-  {
-
-    lat: 0.1,
-    lng: 0.1,
-  },
-  {
-    lat: 0.1,
-    lng: 0.1,
+    lat: 17.76624228,
+    lng: 100.5660871,
   },
   {
 
-    lat: 0.1,
-    lng: 0.1,
+    lat: 17.31862925,
+    lng: 99.42379141,
+  },
+  {
+    lat: 18.52328702,
+    lng: 99.62494695,
+  },
+  {
+
+    lat: 15.72157773,
+    lng: 100.1975544,
   }
 ];
 
@@ -203,7 +202,7 @@ var geo2array = function(features){
 			"lng":feature.properties.lng,
 			"region":feature.properties.region,
 			"NBASIN_T":feature.properties.NBASIN_T,
-			"Sub_BASIN_T": "",
+			"Sub_BASIN_T": feature.properties.SB_NAME_T,
 			"PROV_NAMT":feature.properties.PROV_NAMT,
 			"AMP_NAMT":feature.properties.AMP_NAMT,
 			"TAM_NAMT":feature.properties.TAM_NAMT,
